@@ -20,7 +20,6 @@ export default function UserLogin() {
         const responseBody = await response.json();
         console.log(responseBody);
         if (response.status === 200) {
-            // await alertSuccess("Berhasil Login");
             //save token ke localStorage
             const token = responseBody.data.token;
             setToken(token);
