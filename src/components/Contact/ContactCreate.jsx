@@ -1,6 +1,32 @@
-import {Link} from "react-router";
+import {Link, useNavigate} from "react-router";
+import {useState} from "react";
+import {contactCreate} from "../../lib/api/ContactApi.js";
+import {useLocalStorage} from "react-use";
+import {alertError, alertSuccess} from "../../lib/alert.js";
 
 export default function ContactCreate() {
+
+    const [first_name, setFirstName] = useState("");
+    const [last_name, setLastName] = useState("");
+    const [email, setEmail] = useState("");
+    const [phone, setPhone] = useState("");
+    const [token, _] = useLocalStorage("token", "");
+    const navigate = useNavigate();
+
+
+    async function handleSubmit(e) {
+        e.preventDefault();
+        const response = await contactCreate(token, {first_name:first_name, last_name:last_name, email:email, phone:phone});
+        const responseBody = await response.json();
+
+        if(response.status === 200){
+            await alertSuccess("Berhasil create contact");
+            navigate("/dashboard/contacts");
+        } else{
+            await alertError(responseBody.errors);
+        }
+    }
+
     return(
         <>
             <div className="flex items-center mb-6">
@@ -16,7 +42,7 @@ export default function ContactCreate() {
             <div
                 className="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 overflow-hidden max-w-2xl mx-auto animate-fade-in">
                 <div className="p-8">
-                    <form>
+                    <form onSubmit={handleSubmit}>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
                             <div>
                                 <label htmlFor="first_name" className="block text-gray-300 text-sm font-medium mb-2">First
@@ -28,7 +54,7 @@ export default function ContactCreate() {
                                     </div>
                                     <input type="text" id="first_name" name="first_name"
                                            className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                           placeholder="Enter first name" required/>
+                                           placeholder="Enter first name"  value={first_name} onChange={(e) => setFirstName(e.target.value)}/>
                                 </div>
                             </div>
                             <div>
@@ -41,7 +67,7 @@ export default function ContactCreate() {
                                     </div>
                                     <input type="text" id="last_name" name="last_name"
                                            className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                           placeholder="Enter last name" required/>
+                                           placeholder="Enter last name" required value={last_name} onChange={(e) => setLastName(e.target.value)}/>
                                 </div>
                             </div>
                         </div>
@@ -55,7 +81,7 @@ export default function ContactCreate() {
                                 </div>
                                 <input type="email" id="email" name="email"
                                        className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                       placeholder="Enter email address" required/>
+                                       placeholder="Enter email address" required value={email} onChange={(e) => setEmail(e.target.value)}/>
                             </div>
                         </div>
 
@@ -68,7 +94,7 @@ export default function ContactCreate() {
                                 </div>
                                 <input type="tel" id="phone" name="phone"
                                        className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                       placeholder="Enter phone number" required/>
+                                       placeholder="Enter phone number" required value={phone} onChange={(e) => setPhone(e.target.value)}/>
                             </div>
                         </div>
 
