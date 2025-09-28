@@ -10,7 +10,28 @@ export default function ContactList() {
     const [email, setEmail] = useState("");
     const [phone, setPhone] = useState("");
     const [page, setPage] = useState(1);
+    const [totalPage, setTotalPage] = useState(1);
     const [contacts, setContacts] = useState([]);
+    const [reload, setReload] = useState(false);
+
+    function getPages() {
+        const pages = [];
+        for (let i = 1; i <= totalPage; i++) {
+            pages.push(i);
+        }
+        return pages;
+    }
+
+    async function handleSearchContact(e) {
+        e.preventDefault();
+        setPage(1);
+        setReload(!reload);
+    }
+
+    async function handlePageChange(page){
+        setPage(page);
+        setReload(!reload);
+    }
 
     async function fetchContacts() {
         const response = await contactList(token, {name: name, email: email, phone: phone, page: page});
@@ -19,6 +40,7 @@ export default function ContactList() {
 
         if (response.status === 200) {
             setContacts(responseBody.data);
+            setTotalPage(responseBody.paging.total_page);
 
         } else {
             await alertError(responseBody.errors);
@@ -27,7 +49,7 @@ export default function ContactList() {
 
     useEffect(() => {
         fetchContacts().then(() => console.log("contacts fetched"));
-    }, [])
+    }, [reload])
 
 
     useEffectOnce(() => {
@@ -86,7 +108,7 @@ export default function ContactList() {
                     </button>
                 </div>
                 <div id="searchFormContent" className="mt-4">
-                    <form>
+                    <form onSubmit={handleSearchContact}>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                             <div>
                                 <label htmlFor="search_name"
@@ -98,7 +120,8 @@ export default function ContactList() {
                                     </div>
                                     <input type="text" id="search_name" name="search_name"
                                            className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                           placeholder="Search by name"/>
+                                           placeholder="Search by name" value={name}
+                                           onChange={e => setName(e.target.value)}/>
                                 </div>
                             </div>
                             <div>
@@ -111,7 +134,8 @@ export default function ContactList() {
                                     </div>
                                     <input type="text" id="search_email" name="search_email"
                                            className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                           placeholder="Search by email"/>
+                                           placeholder="Search by email" value={email}
+                                           onChange={e => setEmail(e.target.value)}/>
                                 </div>
                             </div>
                             <div>
@@ -124,7 +148,8 @@ export default function ContactList() {
                                     </div>
                                     <input type="text" id="search_phone" name="search_phone"
                                            className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                           placeholder="Search by phone"/>
+                                           placeholder="Search by phone" value={phone}
+                                           onChange={e => setPhone(e.target.value)}/>
                                 </div>
                             </div>
                         </div>
@@ -155,7 +180,7 @@ export default function ContactList() {
 
                 {contacts.map(contact => (
                     <div key={contact.id}
-                        className="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 overflow-hidden card-hover animate-fade-in">
+                         className="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 overflow-hidden card-hover animate-fade-in">
                         <div className="p-6">
                             <Link to={`/dashboard/contacts/${contact.id}`}
                                   className="block cursor-pointer hover:bg-gray-700 rounded-lg transition-all duration-200 p-3">
@@ -191,7 +216,7 @@ export default function ContactList() {
                             </Link>
                             <div className="mt-4 flex justify-end space-x-3">
                                 <Link to={`/dashboard/contacts/${contact.id}/edit`}
-                                   className="px-4 py-2 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md flex items-center">
+                                      className="px-4 py-2 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md flex items-center">
                                     <i className="fas fa-edit mr-2"></i> Edit
                                 </Link>
                                 <button
@@ -208,26 +233,33 @@ export default function ContactList() {
             <div className="mt-10 flex justify-center">
                 <nav
                     className="flex items-center space-x-3 bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 p-3 animate-fade-in">
-                    <a href="#"
-                       className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center">
-                        <i className="fas fa-chevron-left mr-2"></i> Previous
-                    </a>
-                    <a href="#"
-                       className="px-4 py-2 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md">
-                        1
-                    </a>
-                    <a href="#"
-                       className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200">
-                        2
-                    </a>
-                    <a href="#"
-                       className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200">
-                        3
-                    </a>
-                    <a href="#"
-                       className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center">
-                        Next <i className="fas fa-chevron-right ml-2"></i>
-                    </a>
+
+                    {page > 1 &&
+                        <a href="#" onClick={() => handlePageChange(page - 1)}
+                           className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center">
+                            <i className="fas fa-chevron-left mr-2"></i> Previous
+                        </a>
+                    }
+                    {getPages().map((value) => {
+                        if (value === page) {
+                            return <a key={value} href="#" onClick={() => handlePageChange(value)}
+                                      className="px-4 py-2 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md">
+                                {value}
+                            </a>
+                        } else {
+                            return <a key={value} href="#" onClick={() => handlePageChange(value)}
+                                      className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200">
+                                {value}
+                            </a>
+                        }
+                    })}
+                    {page < totalPage &&
+                        <a href="#" onClick={() => handlePageChange(page + 1)}
+                           className="px-4 py-2 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center">
+                            Next <i className="fas fa-chevron-right ml-2"></i>
+                        </a>
+                    }
+
                 </nav>
             </div>
         </>
