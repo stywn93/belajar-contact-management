@@ -199,7 +199,7 @@ export default function ContactList() {
                     <div key={contact.id}
                          className="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom border border-gray-700 overflow-hidden card-hover animate-fade-in">
                         <div className="p-6">
-                            <Link to={`/dashboard/contacts/${contact.id}`}
+                            <Link to={`/dashboard/contacts/${contact.id}/baca`}
                                   className="block cursor-pointer hover:bg-gray-700 rounded-lg transition-all duration-200 p-3">
                                 <div className="flex items-center mb-3">
                                     <div
