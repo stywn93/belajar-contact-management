@@ -67,3 +67,17 @@ export const contactUpdate = async (token, {id, first_name, last_name, email, ph
         })
     })
 }
+
+export const addAddress = async (token, {id, street, city, province, country, postal_code}) => {
+    return await fetch(`${import.meta.env.VITE_API_PATH}/contacts/${id}/addresses`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': token,
+        },
+        body: JSON.stringify({
+            street, city, province, country, postal_code
+        })
+    })
+}

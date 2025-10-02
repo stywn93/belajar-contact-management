@@ -2,6 +2,7 @@ import {Link, useParams} from "react-router";
 import {useState} from "react";
 import {useEffectOnce, useLocalStorage} from "react-use";
 import {contactDetail} from "../../lib/api/ContactApi.js";
+import {alertError} from "../../lib/alert.js";
 
 export default function ContactDetail() {
     const {id} = useParams();
@@ -16,6 +17,8 @@ export default function ContactDetail() {
 
         if(response.status === 200){
             setContact(responseBody.data);
+        } else{
+            await alertError(responseBody.errors);
         }
     }
 
@@ -53,17 +56,17 @@ export default function ContactDetail() {
                                 className="bg-gray-700 bg-opacity-50 p-5 rounded-lg shadow-md border border-gray-600 transition-all duration-200 hover:bg-opacity-70">
                                 <div className="flex items-center mb-2">
                                     <i className="fas fa-user-tag text-blue-400 mr-2"></i>
-                                    <h3 className="text-gray-300 text-sm font-medium">{contact.first_name}</h3>
+                                    <h3 className="text-gray-300 text-sm font-medium">First Name</h3>
                                 </div>
-                                <p className="text-white text-lg ml-6">John</p>
+                                <p className="text-white text-lg ml-6">{contact.first_name}</p>
                             </div>
                             <div
                                 className="bg-gray-700 bg-opacity-50 p-5 rounded-lg shadow-md border border-gray-600 transition-all duration-200 hover:bg-opacity-70">
                                 <div className="flex items-center mb-2">
                                     <i className="fas fa-user-tag text-blue-400 mr-2"></i>
-                                    <h3 className="text-gray-300 text-sm font-medium">{contact.last_name}</h3>
+                                    <h3 className="text-gray-300 text-sm font-medium">Last Name</h3>
                                 </div>
-                                <p className="text-white text-lg ml-6">Doe</p>
+                                <p className="text-white text-lg ml-6">{contact.last_name}</p>
                             </div>
                         </div>
 
@@ -94,7 +97,7 @@ export default function ContactDetail() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                             <div
                                 className="bg-gray-700 bg-opacity-50 p-5 rounded-lg border-2 border-dashed border-gray-600 shadow-md card-hover">
-                                <a href="add_address.html" className="block h-full">
+                                <Link to={`/dashboard/contacts/${contact.id}/addresses`} className="block h-full">
                                     <div className="flex flex-col items-center justify-center h-full text-center py-4">
                                         <div
                                             className="w-16 h-16 bg-gradient rounded-full flex items-center justify-center mb-4 shadow-lg transform transition-transform duration-300 hover:scale-110">
@@ -102,7 +105,7 @@ export default function ContactDetail() {
                                         </div>
                                         <h4 className="text-lg font-semibold text-white">Add Address</h4>
                                     </div>
-                                </a>
+                                </Link>
                             </div>
 
                             <div
