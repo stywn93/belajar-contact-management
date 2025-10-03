@@ -1,61 +1,65 @@
-import {Link, useNavigate, useParams} from "react-router";
+import {Link, useParams} from "react-router";
+import {addressDetail, contactDetail} from "../../lib/api/ContactApi.js";
+import {alertError} from "../../lib/alert.js";
 import {useEffectOnce, useLocalStorage} from "react-use";
 import {useState} from "react";
-import {addAddress, contactDetail} from "../../lib/api/ContactApi.js";
-import {alertError, alertSuccess} from "../../lib/alert.js";
 
-export default function AddAddress() {
-    const {id} = useParams();
+export default function EditAddress() {
+    const {id, addressId} = useParams();
     const [token, _] = useLocalStorage("token", "");
-    const navigate = useNavigate();
+    const [contact, setContact] = useState({});
     const [street, setStreet] = useState("");
     const [city, setCity] = useState("");
     const [province, setProvince] = useState("");
     const [country, setCountry] = useState("");
     const [postal_code, setPostalCode] = useState("");
-    const [contact, setContact] = useState({});
 
-    //fetch user data
-    async function fetchData(){
+    //fetch contactDetail
+    async function getDetailContact() {
         const response = await contactDetail(token, id);
         const responseBody = await response.json();
         console.log(responseBody);
 
-        if(response.status === 200){
+        if (response.status === 200) {
             setContact(responseBody.data);
-        } else{
+        } else {
+            await alertError(responseBody.errors);
+        }
+    }
+
+    //fetch addressDetail
+    async function getAddress() {
+        const response = await addressDetail(token, id, addressId);
+        const responseBody = await response.json();
+        console.log(responseBody);
+        if (response.status === 200) {
+            setStreet(responseBody.data.street);
+            setCity(responseBody.data.city);
+            setProvince(responseBody.data.province);
+            setCountry(responseBody.data.country);
+            setPostalCode(responseBody.data.postal_code);
+        } else {
             await alertError(responseBody.errors);
         }
     }
 
     useEffectOnce(() => {
-        fetchData()
-            .then(console.log("berhasil fetch detail"));
-    });
+        getDetailContact()
+            .then(console.log(() => "berhasil get contact"));
+        getAddress()
+            .then(console.log(() => "berhasil get address"));
+    })
 
-    //handle form submitting
-    async function handleSubmit(e){
-        e.preventDefault();
-        const response = await addAddress(token, {id, street, city, province, country, postal_code});
-        const responseBody = await response.json();
-
-        if(response.status === 200){
-            await alertSuccess("Berhasil add address");
-            navigate(`/dashboard/contacts/${id}`);
-        } else{
-            await alertError(responseBody.errors);
-        }
-    }
 
     return (
         <>
             <div className="flex items-center mb-6">
-                <Link to={`/dashboard/contacts/${id}`}
-                   className="text-blue-400 hover:text-blue-300 mr-4 flex items-center transition-colors duration-200">
+                <Link to="detail_contact.html"
+                      className="text-blue-400 hover:text-blue-300 mr-4 flex items-center transition-colors duration-200">
                     <i className="fas fa-arrow-left mr-2"></i> Back to Contact Details
                 </Link>
                 <h1 className="text-2xl font-bold text-white flex items-center">
-                    <i className="fas fa-plus-circle text-blue-400 mr-3"></i> Add New Address
+                    <i className="fas fa-map-marker-alt text-blue-400 mr-3"></i> Edit Address
                 </h1>
             </div>
 
@@ -75,7 +79,7 @@ export default function AddAddress() {
                         </div>
                     </div>
 
-                    <form onSubmit={handleSubmit}>
+                    <form>
                         <div className="mb-5">
                             <label htmlFor="street"
                                    className="block text-gray-300 text-sm font-medium mb-2">Street</label>
@@ -85,7 +89,8 @@ export default function AddAddress() {
                                 </div>
                                 <input type="text" id="street" name="street"
                                        className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                       placeholder="Enter street address" required value={street} onChange={(e) => setStreet(e.target.value)}/>
+                                       placeholder="Enter street address" required value={street}
+                                       onChange={(e) => setStreet(e.target.value)}/>
                             </div>
                         </div>
 
@@ -100,7 +105,8 @@ export default function AddAddress() {
                                     </div>
                                     <input type="text" id="city" name="city"
                                            className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                           placeholder="Enter city" required value={city} onChange={(e) => setCity(e.target.value)}/>
+                                           placeholder="Enter city" required value={city}
+                                           onChange={(e) => setCity(e.target.value)}/>
                                 </div>
                             </div>
                             <div>
@@ -113,7 +119,8 @@ export default function AddAddress() {
                                     </div>
                                     <input type="text" id="province" name="province"
                                            className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                           placeholder="Enter province or state" required value={province} onChange={(e) => setProvince(e.target.value)}/>
+                                           placeholder="Enter province or state" required value={province}
+                                           onChange={(e) => setProvince(e.target.value)}/>
                                 </div>
                             </div>
                         </div>
@@ -129,7 +136,8 @@ export default function AddAddress() {
                                     </div>
                                     <input type="text" id="country" name="country"
                                            className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                           placeholder="Enter country" required value={country} onChange={(e) => setCountry(e.target.value)}/>
+                                           placeholder="Enter country" required value={country}
+                                           onChange={(e) => setCountry(e.target.value)}/>
                                 </div>
                             </div>
                             <div>
@@ -142,25 +150,25 @@ export default function AddAddress() {
                                     </div>
                                     <input type="text" id="postal_code" name="postal_code"
                                            className="w-full pl-10 pr-3 py-3 bg-gray-700 bg-opacity-50 border border-gray-600 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200"
-                                           placeholder="Enter postal code" required value={postal_code} onChange={(e) => setPostalCode(e.target.value)}/>
+                                           placeholder="Enter postal code" required value={postal_code}
+                                           onChange={(e) => setPostalCode(e.target.value)}/>
                                 </div>
                             </div>
                         </div>
 
                         <div className="flex justify-end space-x-4">
-                            <Link to={`/dashboard/contacts/${id}`}
+                            <a href="detail_contact.html"
                                className="px-5 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center shadow-md">
                                 <i className="fas fa-times mr-2"></i> Cancel
-                            </Link>
+                            </a>
                             <button type="submit"
                                     className="px-5 py-3 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5 flex items-center">
-                                <i className="fas fa-plus-circle mr-2"></i> Add Address
+                                <i className="fas fa-save mr-2"></i> Save Changes
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
-
         </>
     )
 }

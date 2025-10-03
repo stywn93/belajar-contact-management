@@ -81,3 +81,26 @@ export const addAddress = async (token, {id, street, city, province, country, po
         })
     })
 }
+
+export const listAddress = async (token, {id}) => {
+    return await fetch(`${import.meta.env.VITE_API_PATH}/contacts/${id}/addresses`, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Authorization': token,
+        },
+
+    })
+}
+
+export const addressDetail = async(token, contactID, addressID) => {
+    const url = new URL(`${import.meta.env.VITE_API_PATH}/contacts/${contactID}/addresses/${addressID}`);
+
+    return await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Authorization': token
+        }
+    })
+}
