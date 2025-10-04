@@ -1,4 +1,5 @@
 import {StrictMode} from 'react';
+import './index.css';
 import {createRoot} from 'react-dom/client';
 import {BrowserRouter, Route, Routes} from "react-router";
 import Layout from "./components/Layout.jsx";
@@ -13,7 +14,6 @@ import ContactEdit from "./components/Contact/ContactEdit.jsx";
 import ContactDetail from "./components/Contact/ContactDetail.jsx";
 import AddAddress from "./components/Contact/AddAddress.jsx";
 import EditAddress from "./components/Contact/EditAddress.jsx";
-import './assets/style.css';
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>

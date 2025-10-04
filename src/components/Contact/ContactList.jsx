@@ -180,7 +180,7 @@ export default function ContactList() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div
                     className="bg-gray-800 bg-opacity-80 rounded-xl shadow-custom overflow-hidden border-2 border-dashed border-gray-700 card-hover animate-fade-in">
                     <Link to="/dashboard/contacts/create" className="block p-6 h-full">
