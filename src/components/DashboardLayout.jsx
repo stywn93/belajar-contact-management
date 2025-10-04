@@ -1,6 +1,28 @@
-import {Link, Outlet} from "react-router";
+import {Link, Outlet, useNavigate} from "react-router";
+import {userDetail} from "../lib/api/UserApi.js";
+import {useEffectOnce, useLocalStorage} from "react-use";
 
 export default function DashboardLayout() {
+    const [token, _] = useLocalStorage("token", "");
+    const navigate = useNavigate();
+
+    //cek dulu usernya apakah sudah login atau belum
+    async function getUserStatus(){
+        const response = await userDetail(token);
+        const responseBody = await response.json();
+        console.log(responseBody);
+
+        if(response.status === 200){
+            navigate("/dashboard/contacts");
+        } else{
+            navigate("/login");
+        }
+    }
+
+    useEffectOnce(() => {
+        getUserStatus()
+            .then(console.log(() => "user data fethed"));
+    })
 
     return (
         <>

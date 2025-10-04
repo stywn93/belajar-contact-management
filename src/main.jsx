@@ -13,11 +13,13 @@ import ContactEdit from "./components/Contact/ContactEdit.jsx";
 import ContactDetail from "./components/Contact/ContactDetail.jsx";
 import AddAddress from "./components/Contact/AddAddress.jsx";
 import EditAddress from "./components/Contact/EditAddress.jsx";
+import './assets/style.css';
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
         <BrowserRouter>
             <Routes>
+                <Route path={"/"} element={<DashboardLayout/>}/>
                 <Route element={<Layout/>}>
                     <Route path={"/register"} element={<UserRegister/>}/>
                     <Route path={"/login"} element={<UserLogin/>}/>
