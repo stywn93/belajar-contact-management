@@ -1,6 +1,6 @@
-import {Link, useParams} from "react-router";
-import {addressDetail, contactDetail} from "../../lib/api/ContactApi.js";
-import {alertError} from "../../lib/alert.js";
+import {Link, useNavigate, useParams} from "react-router";
+import {addressDetail, addressUpdate, contactDetail} from "../../lib/api/ContactApi.js";
+import {alertError, alertSuccess} from "../../lib/alert.js";
 import {useEffectOnce, useLocalStorage} from "react-use";
 import {useState} from "react";
 
@@ -13,6 +13,7 @@ export default function EditAddress() {
     const [province, setProvince] = useState("");
     const [country, setCountry] = useState("");
     const [postal_code, setPostalCode] = useState("");
+    const navigate = useNavigate();
 
     //fetch contactDetail
     async function getDetailContact() {
@@ -50,11 +51,25 @@ export default function EditAddress() {
             .then(console.log(() => "berhasil get address"));
     })
 
+    async function handleSubmit(e) {
+        e.preventDefault();
+        const response = await addressUpdate(token, {id, addressId, street, city, province, country, postal_code});
+        const responseBody = await response.json();
+        console.log(responseBody);
+
+        if(response.status === 200){
+            await alertSuccess("Berhasil update address");
+            navigate(`/dashboard/contacts/${id}`);
+        } else{
+            await alertError(responseBody.errors);
+        }
+    }
+
 
     return (
         <>
             <div className="flex items-center mb-6">
-                <Link to="detail_contact.html"
+                <Link to={`/dashboard/contacts/${id}`}
                       className="text-blue-400 hover:text-blue-300 mr-4 flex items-center transition-colors duration-200">
                     <i className="fas fa-arrow-left mr-2"></i> Back to Contact Details
                 </Link>
@@ -79,7 +94,7 @@ export default function EditAddress() {
                         </div>
                     </div>
 
-                    <form>
+                    <form onSubmit={handleSubmit}>
                         <div className="mb-5">
                             <label htmlFor="street"
                                    className="block text-gray-300 text-sm font-medium mb-2">Street</label>
@@ -157,10 +172,10 @@ export default function EditAddress() {
                         </div>
 
                         <div className="flex justify-end space-x-4">
-                            <a href="detail_contact.html"
+                            <Link to={`/dashboard/contacts/${id}`}
                                className="px-5 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 flex items-center shadow-md">
                                 <i className="fas fa-times mr-2"></i> Cancel
-                            </a>
+                            </Link>
                             <button type="submit"
                                     className="px-5 py-3 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-lg transform hover:-translate-y-0.5 flex items-center">
                                 <i className="fas fa-save mr-2"></i> Save Changes

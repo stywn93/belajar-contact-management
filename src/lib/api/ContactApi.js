@@ -104,3 +104,29 @@ export const addressDetail = async(token, contactID, addressID) => {
         }
     })
 }
+
+export const addressUpdate = async (token, {id, addressId, street, city, province, country, postal_code}) => {
+    return await fetch(`${import.meta.env.VITE_API_PATH}/contacts/${id}/addresses/${addressId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Authorization': token,
+        },
+        body: JSON.stringify({
+            street, city, province, country, postal_code
+        })
+    })
+}
+
+export const addressDelete = async(token, id, addressId) => {
+    const url = new URL(`${import.meta.env.VITE_API_PATH}/contacts/${id}/addresses/${addressId}`);
+
+    return await fetch(url, {
+        method: 'DELETE',
+        headers: {
+            'Accept': 'application/json',
+            'Authorization': token
+        }
+    })
+}

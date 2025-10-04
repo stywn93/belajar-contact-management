@@ -1,14 +1,14 @@
 import {Link, useParams} from "react-router";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {useEffectOnce, useLocalStorage} from "react-use";
-import {contactDetail, listAddress} from "../../lib/api/ContactApi.js";
-import {alertError} from "../../lib/alert.js";
+import {addressDelete, contactDetail, listAddress} from "../../lib/api/ContactApi.js";
+import {alertConfirm, alertError, alertSuccess} from "../../lib/alert.js";
 
 export default function ContactDetail() {
     const {id} = useParams();
     const [contact, setContact] = useState({});
     const [address, setAddress] = useState([]);
-
+    const [reload, setReload] = useState(false);
     const [token, _] = useLocalStorage("token", "");
 
     //fetch contact detail
@@ -39,12 +39,29 @@ export default function ContactDetail() {
         }
     }
 
-    useEffectOnce(() => {
+    async function handleAddressDelete(id, addressId) {
+        if (!await alertConfirm("Are you sure want to delete this address?")) {
+            return;
+        }
+
+        const response = await addressDelete(token, id, addressId);
+        const responseBody = await response.json();
+        console.log(responseBody);
+
+        if (response.status === 200) {
+            await alertSuccess("Address deleted successfully.");
+            setReload(!reload);
+        } else {
+            await alertError(responseBody.errors);
+        }
+    }
+
+    useEffect(() => {
         getDetailContact()
             .then(console.log(() => "getDetailContact() done"));
         getAddress()
             .then(console.log("getAddress() done"));
-    });
+    }, [reload]);
     return (
         <>
             <div className="flex items-center mb-6">
@@ -129,7 +146,7 @@ export default function ContactDetail() {
 
                             {address.map((addressNew) => (
                                 <div key={addressNew.id}
-                                    className="bg-gray-700 bg-opacity-50 p-5 rounded-lg shadow-md border border-gray-600 card-hover">
+                                     className="bg-gray-700 bg-opacity-50 p-5 rounded-lg shadow-md border border-gray-600 card-hover">
                                     <div className="flex items-center mb-3">
                                         <div
                                             className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3 shadow-md">
@@ -166,11 +183,11 @@ export default function ContactDetail() {
                                     </div>
                                     <div className="flex justify-end space-x-3">
                                         <Link to={`/dashboard/contacts/${contact.id}/addresses/${addressNew.id}`}
-                                           className="px-4 py-2 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md flex items-center">
+                                              className="px-4 py-2 bg-gradient text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md flex items-center">
                                             <i className="fas fa-edit mr-2"></i> Edit
                                         </Link>
-                                        <button
-                                            className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md flex items-center">
+                                        <button onClick={() => handleAddressDelete(id, addressNew.id)}
+                                                className="px-4 py-2 bg-gradient-to-r from-red-600 to-red-500 text-white rounded-lg hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-gray-800 transition-all duration-200 font-medium shadow-md flex items-center">
                                             <i className="fas fa-trash-alt mr-2"></i> Delete
                                         </button>
                                     </div>
